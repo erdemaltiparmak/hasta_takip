@@ -50,6 +50,27 @@ class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
                 Divider(
                   color: Colors.green.shade600,
                   // thickness: 0.8,
+                ),
+                FutureBuilder(
+                  future: summary,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError)
+                      return Center(
+                        child: Text("Hata"),
+                      );
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Center(child: LinearProgressIndicator());
+                      default:
+                        return !snapshot.hasData
+                            ? Center(
+                                child: Text("Veri Yok"),
+                              )
+                            : Center(
+                                child: Text("snapshot"),
+                              );
+                    }
+                  },
                 )
               ],
             ),
