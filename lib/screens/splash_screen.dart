@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hasta_takip/screens/UI/main_page.dart';
 import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
 import 'package:hasta_takip/size_config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../constants.dart';
+import 'package:hasta_takip/utils/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -16,10 +14,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
     Future.delayed(Duration(seconds: 2, milliseconds: 50), () {
       getSharedPreferences().then((value) => {
-            if (value == null)
+            if (value.getBool('isLogin') == null)
               {
                 Navigator.pushReplacement(
                   context,

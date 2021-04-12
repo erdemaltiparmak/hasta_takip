@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
 import 'package:hasta_takip/size_config.dart';
+import 'package:hasta_takip/utils/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants.dart';
 
@@ -10,13 +13,27 @@ class Profil extends StatefulWidget {
   _ProfilState createState() => _ProfilState();
 }
 
-List<PopUpMenuItems> menuItems = [
-  PopUpMenuItems(Icons.logout, "Çıkış Yap", () => clearSharedPreferences())
-];
-
 class _ProfilState extends State<Profil> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List<PopUpMenuItems> menuItems = [
+      PopUpMenuItems(
+        Icons.logout,
+        "Çıkış Yap",
+        () {
+          clearSharedPreferences();
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (c) => GirisEkrani()));
+          });
+        },
+      )
+    ];
     return Scaffold(
         body: SingleChildScrollView(
       child: Container(
@@ -33,14 +50,14 @@ class _ProfilState extends State<Profil> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Ecem Altıparmak",
-                    style: TextStyle(
-                        color: Colors.green,
-                        fontFamily: 'Muli',
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  )
+                  // Text(
+                  //   Future, // sp.getString('userName'),
+                  //   style: TextStyle(
+                  //       color: Colors.green,
+                  //       fontFamily: 'Muli',
+                  //       fontSize: 20,
+                  //       fontWeight: FontWeight.bold),
+                  // )
                 ],
               ),
             ),

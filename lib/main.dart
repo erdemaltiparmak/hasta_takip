@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hasta_takip/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
+
+String currentUser = "";
 
 class MyApp extends StatelessWidget {
   @override

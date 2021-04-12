@@ -224,9 +224,9 @@ class _GirisFormuState extends State<GirisFormu> {
                                   builder: (context) => MainPage()));
                         });
                       } else {}
-                      setState(() async {
-                        //  _eMail.clear();
-                        //_password.clear();
+                      setState(() {
+                        _eMail.clear();
+                        _password.clear();
                       });
                     }
                   },
@@ -265,6 +265,7 @@ Future<bool> signIn(String email, String password, BuildContext context) async {
 Future<String> _saveSharedPreferences() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.setBool("isLogin", true);
+  await sharedPreferences.setString("userName", _eMail.text);
   return "OK";
 }
 
