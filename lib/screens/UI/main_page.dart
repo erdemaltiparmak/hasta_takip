@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hasta_takip/constants.dart';
+import 'package:hasta_takip/screens/UI/profil/profil.dart';
 import 'package:hasta_takip/screens/UI/statistics/turkiye.dart';
 
 class MainPage extends StatefulWidget {
@@ -7,14 +8,15 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
+List<Screens> screenList = [
+  Screens("Ana Sayfa", Container()),
+  Screens("İstatistikler", TurkiyeIstatistik()),
+  Screens("Container", Container()),
+  Screens("Profil", Profil()),
+];
+
 class _MainPageState extends State<MainPage> {
-  final List _screens = [
-    Container(),
-    TurkiyeIstatistik(),
-    Container(),
-    Container(),
-  ];
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +25,21 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
         elevation: 0,
-        title: Text("Karar verilmedi"),
+        title: Text(screenList[_currentIndex].title),
         centerTitle: true,
       ),
-      body: _screens[_currentIndex],
+      body: screenList[_currentIndex].screen,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) => setState(() {
+          _currentIndex = index;
+        }),
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.green,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        selectedItemColor: Colors.green,
+        showSelectedLabels: true,
+        selectedLabelStyle: TextStyle(color: Colors.white),
+        selectedIconTheme: IconThemeData(size: 28),
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.45),
         elevation: 0.0,
         items: [Icons.home, Icons.insert_chart, Icons.event_note, Icons.info]
@@ -42,19 +47,7 @@ class _MainPageState extends State<MainPage> {
             .map((key, value) => MapEntry(
                   key,
                   BottomNavigationBarItem(
-                    label: "Data",
-                    icon: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _currentIndex == key
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                      child: Icon(value),
-                    ),
-                  ),
+                      label: screenList[key].title, icon: Icon(value)),
                 ))
             .values
             .toList(),
@@ -63,6 +56,8 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+
+   
 /*
  NavigationOption(
                   icon: Icons.accessibility_new_outlined,
