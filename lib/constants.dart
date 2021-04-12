@@ -14,3 +14,6 @@ const String kShortPassError = "Parola en az 7 karakterden oluşmalı";
 const String kNamelNullError = "Ad alanı boş geçilemez";
 const String kSurnameNullError = "Soyad alanı boş geçilemez";
 const String kUsernameNullError = "Kullanıcı adı aannı boş geçilemez";
+
+RegExp reg = new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+Function mathFunc = (Match match) => '${match[1]}.';

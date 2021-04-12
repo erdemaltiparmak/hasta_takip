@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hasta_takip/models/country_summary.dart';
+import 'package:hasta_takip/screens/UI/statistics/turkey_cards.dart';
 import 'package:hasta_takip/services/covid_service.dart';
 
 CovidService covidService = CovidService();
@@ -11,9 +12,9 @@ class TurkiyeIstatistik extends StatefulWidget {
 
 class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
   Future<List<CountrySummaryModel>> summary;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     summary = covidService.getTurkeyStatistics();
   }
@@ -36,10 +37,14 @@ class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
                       style: TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
-                          fontSize: 17),
+                          fontSize: 19),
                     ),
                     GestureDetector(
-                      onTap: null,
+                      onTap: () {
+                        setState(() {
+                          summary = covidService.getTurkeyStatistics();
+                        });
+                      },
                       child: Icon(
                         Icons.refresh,
                         color: Colors.green,
@@ -67,11 +72,13 @@ class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
                                 child: Text("Veri Yok"),
                               )
                             : Center(
-                                child: Text("snapshot"),
+                                child: TurkeyCards(
+                                  turkeySummary: snapshot.data,
+                                ),
                               );
                     }
                   },
-                )
+                ),
               ],
             ),
           )
