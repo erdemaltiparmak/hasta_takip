@@ -4,6 +4,8 @@ import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
 import 'package:hasta_takip/size_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../constants.dart';
+
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -17,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(Duration(seconds: 2, milliseconds: 50), () {
       getSharedPreferences().then((value) => {
-            if (isLogin == null)
+            if (value == null)
               {
                 Navigator.pushReplacement(
                   context,
@@ -64,12 +66,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
-
-bool isLogin;
-
-Future<String> getSharedPreferences() async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  isLogin = sharedPreferences.getBool("isLogin");
-  return "OK";
 }

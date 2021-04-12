@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const kPrimaryColor = Colors.green;
 const kTextColor = Color(0xFF757575);
@@ -31,4 +32,25 @@ class PopUpMenuItems {
   final Function() func;
 
   PopUpMenuItems(this.icon, this.text, this.func);
+}
+
+
+Future<bool> isUserLogin() async{
+ var sharedPreferences =  await getSharedPreferences();
+  return sharedPreferences.getBool("isLogin");
+}
+Future<SharedPreferences> getSharedPreferences() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  return sharedPreferences;
+}
+
+Future<void> clearSharedPreferences() async {
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  sharedPreferences.clear();
+}
+
+class CurrentUser {
+  final String username;
+
+  CurrentUser(this.username=shared);
 }

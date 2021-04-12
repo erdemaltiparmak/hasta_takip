@@ -11,9 +11,7 @@ class Profil extends StatefulWidget {
 }
 
 List<PopUpMenuItems> menuItems = [
-  PopUpMenuItems(Icons.logout, "Çıkış Yap", () {
-    return debugPrint("afas");
-  })
+  PopUpMenuItems(Icons.logout, "Çıkış Yap", () => clearSharedPreferences())
 ];
 
 class _ProfilState extends State<Profil> {
