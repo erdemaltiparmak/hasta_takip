@@ -23,10 +23,10 @@ class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        //mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
             child: Column(
               children: [
                 Row(
@@ -71,10 +71,8 @@ class _TurkiyeIstatistikState extends State<TurkiyeIstatistik> {
                             ? Center(
                                 child: Text("Veri Yok"),
                               )
-                            : Center(
-                                child: TurkeyCards(
-                                  turkeySummary: snapshot.data,
-                                ),
+                            : TurkeyCards(
+                                turkeySummary: snapshot.data,
                               );
                     }
                   },

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1039355421493",
+    "firebase_url": "https://bitirme-e3136-default-rtdb.firebaseio.com",
+    "project_id": "bitirme-e3136",
+    "storage_bucket": "bitirme-e3136.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1039355421493:android:94a71e39e9a7b6a2bda27c",
+        "android_client_info": {
+          "package_name": "com.example.hasta_takip"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1039355421493-lbu6pi5n6po5inidgcv37cah20hvhsbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMxsKFXTtIEtZT9sVF9yuSZ0G50ulxg3k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1039355421493-lbu6pi5n6po5inidgcv37cah20hvhsbc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
