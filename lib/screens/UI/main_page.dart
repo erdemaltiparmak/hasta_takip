@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hasta_takip/constants.dart';
 import 'package:hasta_takip/screens/UI/profil/profil.dart';
 import 'package:hasta_takip/screens/UI/statistics/turkiye.dart';
+import 'package:hasta_takip/screens/map_sample.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -11,7 +13,7 @@ class MainPage extends StatefulWidget {
 List<Screens> screenList = [
   Screens("Ana Sayfa", Container()),
   Screens("İstatistikler", TurkiyeIstatistik()),
-  Screens("Container", Container()),
+  Screens("Container", MapSample()),
   Screens("Profil", Profil()),
 ];
 
@@ -55,3 +57,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+
+final LatLng _center = const LatLng(45.521563, -122.677433);
+
+void _onMapCreated(GoogleMapController controller) {}
