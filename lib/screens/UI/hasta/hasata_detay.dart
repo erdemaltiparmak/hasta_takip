@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hasta_takip/models/hasta.dart';
 import 'package:hasta_takip/size_config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hasta_takip/utils/distance_calculate.dart';
 
 class HastaDetay extends StatefulWidget {
   final Hasta hasta;
@@ -60,88 +61,93 @@ class _HastaDetayState extends State<HastaDetay> {
     final ref = referenceDatabase
         .reference()
         .child("bileklik${hasta.bileklik.bileklikID}");
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        extendBodyBehindAppBar: true,
-        body: StreamBuilder(
-          stream: ref.onValue,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                  child: CircularProgressIndicator(
-                color: Colors.white,
-              ));
-            }
-            return Stack(
-              children: [
-                Positioned.fill(
-                  child: GoogleMap(
-                    onCameraMoveStarted: _onCameraMoveStarted,
-                    onMapCreated: _onMapCreated,
-                    circles: {
-                      Circle(
-                          circleId: CircleId("evCircle"),
-                          strokeWidth: 1,
-                          radius: 20,
-                          center: _center,
-                          fillColor: Colors.greenAccent.withOpacity(.4))
-                    },
-                    markers: {
-                      Marker(
-                          markerId: MarkerId("ev"),
-                          position: _center,
-                          icon: pinLocationIcon,
-                          onTap: () {
-                            print(this._center.toString());
-                          }),
-                      Marker(
-                        markerId: MarkerId("ev"),
-                        position: _person,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
+      body: StreamBuilder(
+        stream: ref.onValue,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+                child: CircularProgressIndicator(
+              color: Colors.white,
+            ));
+          }
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: GoogleMap(
+                  onCameraMoveStarted: _onCameraMoveStarted,
+                  onMapCreated: _onMapCreated,
+                  circles: {
+                    Circle(
+                        circleId: CircleId("evCircle"),
+                        strokeWidth: 1,
+                        radius: 20,
+                        center: LatLng(snapshot.data.snapshot.value['konumX'],
+                            snapshot.data.snapshot.value['konumY']),
+                        fillColor: Colors.greenAccent.withOpacity(.4))
+                  },
+                  markers: {
+                    Marker(
+                        markerId: MarkerId("hasta"),
+                        position: LatLng(snapshot.data.snapshot.value['konumX'],
+                            snapshot.data.snapshot.value['konumY']),
                         icon: personLocationIcon,
-                      )
-                    },
-                    padding: EdgeInsets.only(bottom: 22),
-                    initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: 18.4,
-                    ),
+                        onTap: () {
+                          print(this._center.toString());
+                        }),
+                    Marker(
+                      markerId: MarkerId("ev"),
+                      position: LatLng(hasta.hastaKonumX, hasta.hastaKonumY),
+                      icon: pinLocationIcon,
+                    )
+                  },
+                  padding: EdgeInsets.only(bottom: 22),
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(snapshot.data.snapshot.value['konumX'],
+                        snapshot.data.snapshot.value['konumY']),
+                    zoom: 18.4,
                   ),
                 ),
-                Positioned.fill(
-                  top: 15,
-                  left: 1,
-                  right: 1,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Column(
-                      children: [
-                        userbar(defaultImage: defaultImage, hasta: hasta),
-                        // Container(
-                        //     height: 200,
-                        //     child: ListView(
-                        //       scrollDirection: Axis.horizontal,
-                        //       children: [
-                        //         GrafikKart(context, snapshot,
-                        //             path: 'nabiz', text: "Nabız"),
-                        //         GrafikKart(context, snapshot,
-                        //             path: 'oksijen', text: "Oksijen"),
-                        //         GrafikKart(context, snapshot,
-                        //             path: 'sicaklik', text: "Vücut Sıcaklığı"),
-                        //       ],
-                        //     ))
-                      ],
-                    ),
+              ),
+              Positioned.fill(
+                top: 30,
+                left: 1,
+                right: 1,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      UserBar(
+                          defaultImage: defaultImage,
+                          hasta: hasta,
+                          snapshot: snapshot),
+                      Container(
+                        height: 200,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            GrafikKart(context, snapshot,
+                                path: 'nabiz', text: "Nabız"),
+                            GrafikKart(context, snapshot,
+                                path: 'oksijen', text: "Oksijen"),
+                            GrafikKart(context, snapshot,
+                                path: 'sicaklik', text: "Vücut Sıcaklığı"),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                HastaAyrinti(
-                  hasta: hasta,
-                  snapshot: snapshot,
-                )
-              ],
-            );
-          },
-        ),
+              ),
+              HastaAyrinti(
+                hasta: hasta,
+                snapshot: snapshot,
+              )
+            ],
+          );
+        },
       ),
     );
   }
@@ -150,8 +156,9 @@ class _HastaDetayState extends State<HastaDetay> {
       {String text, String path}) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          color: Colors.grey, borderRadius: BorderRadius.circular(20)),
       margin: EdgeInsets.all(10),
+      padding: EdgeInsets.zero,
       width: MediaQuery.of(context).size.width * 0.8,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -167,51 +174,89 @@ class _HastaDetayState extends State<HastaDetay> {
 class HastaAyrinti extends StatelessWidget {
   const HastaAyrinti({
     Key key,
-    Hasta hasta,
-    AsyncSnapshot<dynamic> snapshot,
+    this.hasta,
+    this.snapshot,
   }) : super(key: key);
+  final Hasta hasta;
+  final AsyncSnapshot<dynamic> snapshot;
 
   @override
   Widget build(BuildContext context) {
-    print(MediaQuery.of(context).size.height * 1);
-    print(MediaQuery.of(context).size.height * 0.025);
-    print(MediaQuery.of(context).size.height * (1 - 0.025));
+    //print(snapshot.data.snapshot.value.toString());
+    var veri = snapshot.data.snapshot.value.toString();
+    List veriler;
+    veriler = veri
+        .replaceAll(RegExp(r'{'), "")
+        .replaceAll("}", " ")
+        .replaceAll(" ", "")
+        .split(",");
+    var map = Map<dynamic, dynamic>();
+
+    veriler.forEach((element) {
+      map[element.toString().split(':')[0]] = element.toString().split(':')[1];
+    });
 
     return Positioned.fill(
+        bottom: 0,
         child: Container(
-      padding: EdgeInsets.zero,
-      child: DraggableScrollableSheet(
-          expand: true,
-          maxChildSize: 0.575,
-          initialChildSize: 0.025,
-          minChildSize: 0.025,
-          builder: (context, controller) {
-            return SingleChildScrollView(
-              controller: controller,
-              primary: false,
-              child: Column(children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.025,
-                  color: Colors.red,
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.45,
-                  width: double.infinity,
-                  color: Colors.black,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "data",
-                        style: TextStyle(color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
-              ]),
-            );
-          }),
-    ));
+          child: DraggableScrollableSheet(
+              expand: true,
+              maxChildSize: 0.575,
+              initialChildSize: 0.025,
+              minChildSize: 0.025,
+              builder: (context, controller) {
+                return SingleChildScrollView(
+                  controller: controller,
+                  child: Column(children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.025,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 55,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: MediaQuery.of(context).size.height * 0.550,
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Hasta Bilgileri",
+                                style: TextStyle(color: Colors.black),
+                              )
+                            ],
+                          ),
+                          Text("Hasta Adı:" + hasta.hastaAd),
+                          Text("Hasta Soyadı:" + hasta.hastaSoyad),
+                          Text("Hasta Yaşı:" + hasta.hastaYas.toString()),
+                          Text("Hasta Öyküsü:" + hasta.hastaOyku),
+                          Text("Hasta İletişim:" + hasta.hastaIletisimNo),
+                          Text("Hasta Adres:" + hasta.hastaAcikAdres),
+                        ],
+                      ),
+                    ),
+                  ]),
+                );
+              }),
+        ));
   }
 }
 
@@ -242,18 +287,25 @@ class sensorverileri extends StatelessWidget {
   }
 }
 
-class userbar extends StatelessWidget {
-  const userbar({
-    Key key,
-    @required this.defaultImage,
-    @required this.hasta,
-  }) : super(key: key);
+class UserBar extends StatelessWidget {
+  const UserBar(
+      {Key key,
+      @required this.defaultImage,
+      @required this.hasta,
+      @required this.snapshot})
+      : super(key: key);
 
   final ImageProvider<Object> defaultImage;
   final Hasta hasta;
-
+  final AsyncSnapshot<dynamic> snapshot;
   @override
   Widget build(BuildContext context) {
+    var distance = getDistanceFromLatLonInKm(
+        snapshot.data.snapshot.value['konumX'],
+        snapshot.data.snapshot.value['konumY'],
+        hasta.hastaKonumX,
+        hasta.hastaKonumY);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Align(
@@ -286,11 +338,11 @@ class userbar extends StatelessWidget {
                       children: [
                         Text(
                           hasta.hastaAd + " " + hasta.hastaSoyad,
-                          style: TextStyle(color: Colors.green, fontSize: 17),
+                          style: TextStyle(color: Colors.black, fontSize: 17),
                         ),
                         Text(
                           hasta.hastaYas.toString(),
-                          style: TextStyle(color: Colors.green, fontSize: 16),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
                         ),
                       ],
                     ),
@@ -302,19 +354,30 @@ class userbar extends StatelessWidget {
                   ),
                 ],
               ),
-              DateTime.parse(hasta.bileklik.takilmaTarihi)
-                          .add(Duration(days: 10))
-                          .difference(DateTime.now())
-                          .inDays >
-                      0
-                  ? Text("Kalan Karantina Süresi:" +
-                      DateTime.parse(hasta.bileklik.takilmaTarihi)
-                          .add(Duration(days: 10))
-                          .difference(DateTime.now())
-                          .inDays
-                          .toString() +
-                      " Gün")
-                  : Container()
+              distance < 50
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Hasta Evinde :",
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          distance.toStringAsFixed(2) + " m",
+                          style: TextStyle(color: Colors.black, fontSize: 15),
+                        )
+                      ],
+                    )
+                  : Text(
+                      "Hasta evinde değil!",
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 21),
+                    )
             ],
           ),
         ),
