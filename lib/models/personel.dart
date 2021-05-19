@@ -43,14 +43,26 @@ class Hastas {
   String hastaAd;
   String hastaSoyad;
   int hastaYas;
+  List<Bileklik> bileklik;
 
-  Hastas({this.hastaID, this.hastaAd, this.hastaSoyad, this.hastaYas});
+  Hastas(
+      {this.hastaID,
+      this.hastaAd,
+      this.hastaSoyad,
+      this.hastaYas,
+      this.bileklik});
 
   Hastas.fromJson(Map<String, dynamic> json) {
     hastaID = json['hastaID'];
     hastaAd = json['hastaAd'];
     hastaSoyad = json['hastaSoyad'];
     hastaYas = json['hastaYas'];
+    if (json['bileklik'] != null) {
+      bileklik = new List<Bileklik>();
+      json['bileklik'].forEach((v) {
+        bileklik.add(new Bileklik.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +71,29 @@ class Hastas {
     data['hastaAd'] = this.hastaAd;
     data['hastaSoyad'] = this.hastaSoyad;
     data['hastaYas'] = this.hastaYas;
+    if (this.bileklik != null) {
+      data['bileklik'] = this.bileklik.map((v) => v.toJson()).toList();
+    }
+
+    return data;
+  }
+}
+
+class Bileklik {
+  int bileklikID;
+  String takilmaTarihi;
+
+  Bileklik({this.bileklikID, this.takilmaTarihi});
+
+  Bileklik.fromJson(Map<String, dynamic> json) {
+    bileklikID = json['bileklikID'];
+    takilmaTarihi = json['takilmaTarihi'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['bileklikID'] = this.bileklikID;
+    data['takilmaTarihi'] = this.takilmaTarihi;
     return data;
   }
 }

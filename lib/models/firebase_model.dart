@@ -43,9 +43,6 @@ class FirebaseModel {
     data['HastaAcikAdres'] = this.hastaAcikAdres;
     data['HastaKonumX'] = this.hastaKonumX;
     data['HastaKonumY'] = this.hastaKonumY;
-    if (this.bileklik != null) {
-      data['Bileklik'] = this.bileklik.toJson();
-    }
     return data;
   }
 }

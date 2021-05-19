@@ -199,7 +199,10 @@ class _ProfilState extends State<Profil> {
                           Column(
                             children: [
                               Text(
-                                "Karantina Günü",
+                                karantinaHesapla(
+                                            hasta.bileklik[0].takilmaTarihi)
+                                        .toString() +
+                                    "/10",
                                 textAlign: TextAlign.end,
                               ),
                             ],
@@ -254,4 +257,11 @@ class _ProfilState extends State<Profil> {
   void popUpAction(Function() func) {
     func.call();
   }
+}
+
+int karantinaHesapla(String takilmaTarihi) {
+  var bitisTarihi = DateTime.parse(takilmaTarihi);
+
+  var fark = 10 - bitisTarihi.difference(DateTime.now()).inDays;
+  return fark;
 }
