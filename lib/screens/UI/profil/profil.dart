@@ -1,16 +1,10 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hasta_takip/models/country_summary.dart';
 import 'package:hasta_takip/models/hasta.dart';
 import 'package:hasta_takip/models/personel.dart';
 import 'package:hasta_takip/screens/UI/hasta/hasata_detay.dart';
 import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
 import 'package:hasta_takip/services/covid_service.dart';
-import 'package:hasta_takip/size_config.dart';
 import 'package:hasta_takip/utils/shared_preferences.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 
 class Profil extends StatefulWidget {
@@ -51,118 +45,127 @@ class _ProfilState extends State<Profil> {
       )
     ];
     return Scaffold(
+        appBar: AppBar(
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+              ),
+            ),
+            title: Text("Hastalarım"),
+            centerTitle: true,
+            backgroundColor: Colors.green),
+        backgroundColor: Colors.white.withOpacity(0.95),
         body: Stack(
-      children: [
-        Container(
-          margin: EdgeInsets.only(top: 20),
-          child: Column(
-            children: [
-              Stack(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 20),
+              child: Column(
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(top: 20, left: 10, right: 10),
-                    height: 140,
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(17),
-                        color: Colors.grey.shade300),
+                  Stack(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 20, left: 10, right: 10),
+                        height: 140,
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(17),
+                            color: Colors.grey.shade300),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(right: 15, top: 25),
+                        alignment: Alignment.topRight,
+                        child: PopupMenuButton(
+                            onSelected: popUpAction,
+                            child: Icon(
+                              Icons.settings,
+                              color: Colors.green,
+                              size: 28,
+                            ),
+                            tooltip: "Ayarlar",
+                            itemBuilder: (context) {
+                              return menuItems
+                                  .map((e) => PopupMenuItem(
+                                        child: ListTile(
+                                          isThreeLine: false,
+                                          contentPadding: EdgeInsets.all(0),
+                                          title: Text(e.text,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                              )),
+                                          leading:
+                                              Icon(e.icon, color: Colors.red),
+                                        ),
+                                        value: e.func,
+                                      ))
+                                  .toList();
+                            }),
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              "https://previews.123rf.com/images/yupiramos/yupiramos1607/yupiramos160705616/59613224-doctor-avatar-profile-isolated-icon-vector-illustration-graphic-.jpg"),
+                          maxRadius: 50,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 115),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Doç. Dr. Cüneyt Bayılmış",
+                          style: TextStyle(color: Colors.black, fontSize: 17),
+                        ),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: 12, right: 12, top: 12, bottom: 6),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Text(
-                        //   Future, // sp.getString('userName'),
-                        //   style: TextStyle(
-                        //       color: Colors.green,
-                        //       fontFamily: 'Muli',
-                        //       fontSize: 20,
-                        //       fontWeight: FontWeight.bold),
-                        // )
+                        Text(
+                          "Hastalarım",
+                          style: TextStyle(
+                              color: Colors.green.withGreen(150),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down_circle_outlined,
+                          color: Colors.green,
+                        )
                       ],
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.only(right: 15, top: 25),
-                    alignment: Alignment.topRight,
-                    child: PopupMenuButton(
-                        onSelected: popUpAction,
-                        child: Icon(
-                          Icons.settings,
-                          color: Colors.green,
-                          size: 28,
-                        ),
-                        tooltip: "Ayarlar",
-                        itemBuilder: (context) {
-                          return menuItems
-                              .map((e) => PopupMenuItem(
-                                    child: ListTile(
-                                      isThreeLine: false,
-                                      contentPadding: EdgeInsets.all(0),
-                                      title: Text(e.text,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                          )),
-                                      leading: Icon(e.icon, color: Colors.red),
-                                    ),
-                                    value: e.func,
-                                  ))
-                              .toList();
-                        }),
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://previews.123rf.com/images/yupiramos/yupiramos1607/yupiramos160705616/59613224-doctor-avatar-profile-isolated-icon-vector-illustration-graphic-.jpg"),
-                      maxRadius: 50,
-                      backgroundColor: Colors.white,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 115),
+                  HastaListesi(),
+                ],
+              ),
+            ),
+            isLoading
+                ? Stack(
                     alignment: Alignment.center,
-                    child: Text(
-                      "Doç. Dr. Cüneyt Bayılmış",
-                      style: TextStyle(color: Colors.black, fontSize: 17),
-                    ),
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        width: double.infinity,
+                        color: Colors.white.withOpacity(0.82),
+                      ),
+                      CircularProgressIndicator(color: Colors.green)
+                    ],
                   )
-                ],
-              ),
-              Padding(
-                padding:
-                    EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Hastalarım",
-                      style: TextStyle(color: kPrimaryColor, fontSize: 18),
-                    ),
-                    Icon(
-                      Icons.arrow_drop_down_circle_outlined,
-                      color: Colors.green,
-                    )
-                  ],
-                ),
-              ),
-              HastaListesi(),
-            ],
-          ),
-        ),
-        isLoading
-            ? Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: double.infinity,
-                    color: Colors.white.withOpacity(0.82),
-                  ),
-                  CircularProgressIndicator(color: Colors.green)
-                ],
-              )
-            : Container()
-      ],
-    ));
+                : Container()
+          ],
+        ));
   }
 
   Widget HastaListesi() {

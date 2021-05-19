@@ -37,6 +37,9 @@ dependencies:
   firebase_core: 
   firebase_database: 
   google_maps_flutter: 
+  font_awesome_flutter: 
+  url_launcher: 
+  
 
 dev_dependencies:
   flutter_test:

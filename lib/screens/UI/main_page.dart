@@ -13,7 +13,7 @@ class MainPage extends StatefulWidget {
 List<Screens> screenList = [
   Screens("Ana Sayfa", Container()),
   Screens("İstatistikler", TurkiyeIstatistik()),
-  Screens("Container", MapSample()),
+  Screens("Container", MainScreen()),
   Screens("Profil", Profil()),
 ];
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hasta_takip/screens/UI/main_page.dart';
 import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
+import 'package:hasta_takip/screens/map_sample.dart';
 import 'package:hasta_takip/size_config.dart';
 import 'package:hasta_takip/utils/shared_preferences.dart';
 
@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
               {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MainPage()),
+                  MaterialPageRoute(builder: (context) => MainScreen()),
                 )
               }
           });

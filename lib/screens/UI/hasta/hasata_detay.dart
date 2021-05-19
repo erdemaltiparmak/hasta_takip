@@ -1,30 +1,26 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:math';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hasta_takip/models/hasta.dart';
-import 'package:hasta_takip/size_config.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hasta_takip/utils/distance_calculate.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'hasta_bar.dart';
 
 class HastaDetay extends StatefulWidget {
   final Hasta hasta;
   const HastaDetay({Key key, @required this.hasta}) : super(key: key);
-
   @override
   _HastaDetayState createState() => _HastaDetayState(hasta);
 }
 
 class _HastaDetayState extends State<HastaDetay> {
+  final Hasta hasta;
+  final referenceDatabase = FirebaseDatabase.instance;
+
   Completer<GoogleMapController> mapController = Completer();
-
-  final LatLng _center = const LatLng(41.0235946, 28.7858438);
-  final LatLng _person = const LatLng(41.0245946, 28.782938);
-
   BitmapDescriptor pinLocationIcon;
   BitmapDescriptor personLocationIcon;
+  ImageProvider defaultImage;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController.complete(controller);
@@ -32,10 +28,6 @@ class _HastaDetayState extends State<HastaDetay> {
 
   void _onCameraMoveStarted() {}
 
-  final referenceDatabase = FirebaseDatabase.instance;
-  ImageProvider defaultImage;
-  final Hasta hasta;
-  var text = "";
   _HastaDetayState(this.hasta);
   @override
   void initState() {
@@ -54,8 +46,6 @@ class _HastaDetayState extends State<HastaDetay> {
     super.initState();
   }
 
-  var selectedPin = 1;
-
   @override
   Widget build(BuildContext context) {
     final ref = referenceDatabase
@@ -69,9 +59,10 @@ class _HastaDetayState extends State<HastaDetay> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-                child: CircularProgressIndicator(
-              color: Colors.white,
-            ));
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            );
           }
           return Stack(
             children: [
@@ -93,10 +84,7 @@ class _HastaDetayState extends State<HastaDetay> {
                         markerId: MarkerId("hasta"),
                         position: LatLng(snapshot.data.snapshot.value['konumX'],
                             snapshot.data.snapshot.value['konumY']),
-                        icon: personLocationIcon,
-                        onTap: () {
-                          print(this._center.toString());
-                        }),
+                        icon: personLocationIcon),
                     Marker(
                       markerId: MarkerId("ev"),
                       position: LatLng(hasta.hastaKonumX, hasta.hastaKonumY),
@@ -152,7 +140,7 @@ class _HastaDetayState extends State<HastaDetay> {
     );
   }
 
-  Container GrafikKart(BuildContext context, AsyncSnapshot<dynamic> snapshot,
+  Widget GrafikKart(BuildContext context, AsyncSnapshot<dynamic> snapshot,
       {String text, String path}) {
     return Container(
       decoration: BoxDecoration(
@@ -182,20 +170,6 @@ class HastaAyrinti extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //print(snapshot.data.snapshot.value.toString());
-    var veri = snapshot.data.snapshot.value.toString();
-    List veriler;
-    veriler = veri
-        .replaceAll(RegExp(r'{'), "")
-        .replaceAll("}", " ")
-        .replaceAll(" ", "")
-        .split(",");
-    var map = Map<dynamic, dynamic>();
-
-    veriler.forEach((element) {
-      map[element.toString().split(':')[0]] = element.toString().split(':')[1];
-    });
-
     return Positioned.fill(
         bottom: 0,
         child: Container(
@@ -240,16 +214,68 @@ class HastaAyrinti extends StatelessWidget {
                             children: [
                               Text(
                                 "Hasta Bilgileri",
-                                style: TextStyle(color: Colors.black),
+                                style: TextStyle(
+                                    color: Colors.green.withGreen(140),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24),
                               )
                             ],
                           ),
-                          Text("Hasta Adı:" + hasta.hastaAd),
-                          Text("Hasta Soyadı:" + hasta.hastaSoyad),
-                          Text("Hasta Yaşı:" + hasta.hastaYas.toString()),
-                          Text("Hasta Öyküsü:" + hasta.hastaOyku),
-                          Text("Hasta İletişim:" + hasta.hastaIletisimNo),
-                          Text("Hasta Adres:" + hasta.hastaAcikAdres),
+                          Container(
+                            padding: EdgeInsets.only(left: 14, top: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MouseRegion(
+                                  onHover: (v) {
+                                    print(v.toString());
+                                  },
+                                  child: HastaBilgileriText(
+                                    text: "Hasta Adı",
+                                    bilgi: hasta.hastaAd +
+                                        " " +
+                                        hasta.hastaSoyad +
+                                        " (${hasta.hastaYas})",
+                                  ),
+                                ),
+                                HastaBilgileriText(
+                                  text: "Hasta Öyküsü",
+                                  bilgi: hasta.hastaOyku,
+                                ),
+                                HastaBilgileriText(
+                                  text: "Hasta İletişim No",
+                                  bilgi: hasta.hastaIletisimNo,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              hastaBilgileriButton(
+                                  toolTip:
+                                      "Hastayı Ara\n${hasta.hastaIletisimNo}",
+                                  icon: Icons.call_outlined,
+                                  onPressed: () {
+                                    _launchCaller(
+                                        "tel:${hasta.hastaIletisimNo}");
+                                  }),
+                              hastaBilgileriButton(
+                                  icon: Icons.mail_outlined,
+                                  onPressed: () {
+                                    _launchCaller(
+                                        "sms:${hasta.hastaIletisimNo}");
+                                  }),
+                              hastaBilgileriButton(
+                                  icon: Icons.ac_unit,
+                                  onPressed: () {
+                                    _launchCaller("tel:112");
+                                  },
+                                  text: "112"),
+                            ],
+                          ),
+                          Spacer(),
                         ],
                       ),
                     ),
@@ -258,157 +284,89 @@ class HastaAyrinti extends StatelessWidget {
               }),
         ));
   }
-}
 
-class sensorverileri extends StatelessWidget {
-  const sensorverileri({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: 200,
-        child: Expanded(
-            child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: 3,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20)),
-                    margin: EdgeInsets.all(10),
-                    height: 200,
-                    width: MediaQuery.of(context).size.width * 0.8,
-                  );
-                })));
-  }
-}
-
-class UserBar extends StatelessWidget {
-  const UserBar(
-      {Key key,
-      @required this.defaultImage,
-      @required this.hasta,
-      @required this.snapshot})
-      : super(key: key);
-
-  final ImageProvider<Object> defaultImage;
-  final Hasta hasta;
-  final AsyncSnapshot<dynamic> snapshot;
-  @override
-  Widget build(BuildContext context) {
-    var distance = getDistanceFromLatLonInKm(
-        snapshot.data.snapshot.value['konumX'],
-        snapshot.data.snapshot.value['konumY'],
-        hasta.hastaKonumX,
-        hasta.hastaKonumY);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.only(left: 10, right: 10, bottom: 0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                      width: 55,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        image: DecorationImage(image: defaultImage),
-                      )),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          hasta.hastaAd + " " + hasta.hastaSoyad,
-                          style: TextStyle(color: Colors.black, fontSize: 17),
-                        ),
-                        Text(
-                          hasta.hastaYas.toString(),
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.location_on,
-                    color: Colors.green,
-                    size: 36,
-                  ),
-                ],
-              ),
-              distance < 50
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Hasta Evinde :",
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16.5,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          distance.toStringAsFixed(2) + " m",
-                          style: TextStyle(color: Colors.black, fontSize: 15),
-                        )
-                      ],
-                    )
-                  : Text(
-                      "Hasta evinde değil!",
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 21),
-                    )
-            ],
+  Widget hastaBilgileriButton(
+      {@required Object icon,
+      @required Function onPressed,
+      String text = "",
+      String toolTip = ""}) {
+    return MouseRegion(
+      onHover: (v) {
+        print(v.toString());
+      },
+      child: Container(
+        width: 70,
+        height: 70,
+        margin: EdgeInsets.only(left: 10),
+        decoration: BoxDecoration(
+            color: Colors.green, borderRadius: BorderRadius.circular(5)),
+        child: Tooltip(
+          message: toolTip,
+          child: MaterialButton(
+            child: text == ""
+                ? Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 34,
+                  )
+                : Text(text,
+                    style: TextStyle(color: Colors.white, fontSize: 22.2)),
+            splashColor: Colors.black,
+            onPressed: onPressed,
           ),
         ),
       ),
     );
   }
 }
-            // print(snapshot.data.snapshot.value.toString());
-            // return Text(snapshot.data.snapshot.value.toString());
-            // 
-/*
 
-Container(
-              height: 200,
-              child: Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)),
-                      margin: EdgeInsets.all(10),
-                      height: 200,
-                      width: MediaQuery.of(context).size.width * 0.8,
-                    );
-                    ],
-                  ),
-                ),
-              ],
-            );
- */
+class HastaBilgileriText extends StatelessWidget {
+  const HastaBilgileriText({Key key, @required this.bilgi, @required this.text})
+      : super(key: key);
+
+  final String bilgi, text;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(bottom: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.only(
+              bottom: 2, // Space between underline and text
+            ),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+              color: Colors.green,
+              width: 2.0, // Underline thickness
+            ))),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 17,
+                color: Colors.green.withGreen(100),
+              ),
+            ),
+          ),
+          Text(bilgi,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17)),
+        ],
+      ),
+    );
+  }
+}
+
+_launchCaller(String url) async {
+  try {
+    await launch(url);
+  } catch (e) {
+    print(e.toString());
+  }
+}

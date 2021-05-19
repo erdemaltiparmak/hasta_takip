@@ -50,5 +50,6 @@
      
     </application>
       <uses-permission android:name="android.permission.INTERNET"/> <!-- Add this -->
+      <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
 </manifest>
