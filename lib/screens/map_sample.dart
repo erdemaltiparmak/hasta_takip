@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen>
                           MaterialPageRoute(builder: (context) => Profil()));
                     }),
                 anaSayfaButton(
-                    icon: Icons.people,
+                    icon: Icons.bar_chart,
                     text: "İstatistikler",
                     onPressed: () {
                       Navigator.push(
@@ -63,10 +63,6 @@ class _MainScreenState extends State<MainScreen>
                           MaterialPageRoute(
                               builder: (context) => TurkiyeIstatistik()));
                     }),
-                anaSayfaButton(
-                    icon: Icons.people, text: "Hastalarım", onPressed: () {}),
-                anaSayfaButton(
-                    icon: Icons.people, text: "Hastalarım", onPressed: () {}),
               ],
             ),
           ],

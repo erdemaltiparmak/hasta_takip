@@ -8,7 +8,9 @@ import 'package:hasta_takip/utils/shared_preferences.dart';
 import '../../../constants.dart';
 
 class Profil extends StatefulWidget {
-  Profil({Key key}) : super(key: key);
+  Profil({
+    Key key,
+  }) : super(key: key);
 
   @override
   _ProfilState createState() => _ProfilState();

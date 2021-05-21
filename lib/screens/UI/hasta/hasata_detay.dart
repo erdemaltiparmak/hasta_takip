@@ -112,16 +112,17 @@ class _HastaDetayState extends State<HastaDetay> {
                           hasta: hasta,
                           snapshot: snapshot),
                       Container(
-                        height: 200,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.only(top: 8),
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             GrafikKart(context, snapshot,
                                 path: 'nabiz', text: "Nabız"),
                             GrafikKart(context, snapshot,
-                                path: 'oksijen', text: "Oksijen"),
+                                path: 'oksijen', text: "SpO2"),
                             GrafikKart(context, snapshot,
-                                path: 'sicaklik', text: "Vücut Sıcaklığı"),
+                                path: 'sicaklik', text: "Ateş"),
                           ],
                         ),
                       ),
@@ -143,16 +144,25 @@ class _HastaDetayState extends State<HastaDetay> {
   Widget GrafikKart(BuildContext context, AsyncSnapshot<dynamic> snapshot,
       {String text, String path}) {
     return Container(
-      decoration: BoxDecoration(
-          color: Colors.grey, borderRadius: BorderRadius.circular(20)),
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.zero,
-      width: MediaQuery.of(context).size.width * 0.8,
-      child: Column(
+      height: 50,
+      width: MediaQuery.of(context).size.width / 3.3,
+      decoration: BoxDecoration(boxShadow: <BoxShadow>[
+        BoxShadow(
+          blurRadius: 2,
+          color: Colors.green,
+        )
+      ], borderRadius: BorderRadius.circular(10), color: Colors.white),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(text),
-          Text(snapshot.data.snapshot.value[path].toString()),
+          Text(
+            text + ": ",
+            style: TextStyle(color: Colors.black, fontSize: 19),
+          ),
+          Text(
+            snapshot.data.snapshot.value[path].toString(),
+            style: TextStyle(color: Colors.black, fontSize: 19),
+          ),
         ],
       ),
     );

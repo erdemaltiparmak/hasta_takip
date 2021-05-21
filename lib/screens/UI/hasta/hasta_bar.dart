@@ -27,6 +27,12 @@ class UserBar extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Container(
           decoration: BoxDecoration(
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                blurRadius: 2,
+                color: Colors.green,
+              )
+            ],
             borderRadius: BorderRadius.circular(50),
             color: Colors.white,
           ),
