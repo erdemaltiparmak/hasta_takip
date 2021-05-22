@@ -35,8 +35,9 @@ class _MainScreenState extends State<MainScreen>
         () {
           clearSharedPreferences();
           Future.delayed(Duration(seconds: 1), () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (c) => GirisEkrani()));
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => GirisEkrani()),
+                (Route<dynamic> route) => false);
           });
         },
       )
