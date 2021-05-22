@@ -8,7 +8,7 @@ const defaultDuration = Duration(milliseconds: 250);
 // Form Error
 final RegExp emailValidatorRegExp =
     RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-const String kEmailNullError = "E-mail adresi boş geçilemez";
+const String kEmailNullError = "Kullanıcı adı boş geçilemez";
 const String kInvalidEmailError = "Lütfen geçerli bir e-mail adresi giriniz";
 const String kPassNullError = "Şifre alanı boş geçilemez";
 const String kShortPassError = "Parola en az 7 karakterden oluşmalı";

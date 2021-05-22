@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hasta_takip/models/current_user.dart';
 import 'package:hasta_takip/screens/UI/statistics/turkiye.dart';
+import 'package:hasta_takip/screens/splash_screen.dart';
+import 'package:hasta_takip/services/current_user_service.dart';
 import 'package:hasta_takip/utils/shared_preferences.dart';
 import '../constants.dart';
 import 'UI/profil/profil.dart';
@@ -10,8 +14,19 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
+CurrentUserService currentUserService = CurrentUserService();
+
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
+  @override
+  void initState() {
+    globalCurrentUser =
+        currentUserService.getPersonel(FirebaseAuth.instance.currentUser.email);
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<PopUpMenuItems> menuItems = [
       PopUpMenuItems(
@@ -37,37 +52,55 @@ class _MainScreenState extends State<MainScreen>
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            ProfilHeader(menuItems: menuItems),
-            GridView.count(
-              padding: EdgeInsets.only(top: 11, left: 22.5, right: 22.5),
-              mainAxisSpacing: 5,
-              crossAxisSpacing: 5,
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              children: <Widget>[
-                anaSayfaButton(
-                    icon: Icons.people,
-                    text: "Hastalarım",
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Profil()));
-                    }),
-                anaSayfaButton(
-                    icon: Icons.bar_chart,
-                    text: "İstatistikler",
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TurkiyeIstatistik()));
-                    }),
-              ],
-            ),
-          ],
-        ),
-      ),
+          child: FutureBuilder(
+              future: globalCurrentUser,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.green,
+                    ),
+                  );
+                }
+                CurrentUser user = snapshot.data;
+
+                return Column(
+                  children: [
+                    ProfilHeader(menuItems: menuItems, user: snapshot.data),
+                    GridView.count(
+                      padding:
+                          EdgeInsets.only(top: 11, left: 22.5, right: 22.5),
+                      mainAxisSpacing: 5,
+                      crossAxisSpacing: 5,
+                      shrinkWrap: true,
+                      crossAxisCount: 2,
+                      children: <Widget>[
+                        anaSayfaButton(
+                            icon: Icons.people,
+                            text: "Hastalarım",
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Profil(
+                                            personelId: user.personelID,
+                                          )));
+                            }),
+                        anaSayfaButton(
+                            icon: Icons.bar_chart,
+                            text: "İstatistikler",
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          TurkiyeIstatistik()));
+                            }),
+                      ],
+                    ),
+                  ],
+                );
+              })),
     );
   }
 }
@@ -100,10 +133,11 @@ class ProfilHeader extends StatelessWidget {
   const ProfilHeader({
     Key key,
     @required this.menuItems,
+    @required this.user,
   }) : super(key: key);
 
   final List<PopUpMenuItems> menuItems;
-
+  final CurrentUser user;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -162,7 +196,7 @@ class ProfilHeader extends StatelessWidget {
                 padding: EdgeInsets.only(top: 10),
                 alignment: Alignment.center,
                 child: Text(
-                  "Doç. Dr. Cüneyt Bayılmış",
+                  user.personelAd + " " + user.personelSoyad,
                   style: TextStyle(color: Colors.black, fontSize: 17),
                 ),
               )

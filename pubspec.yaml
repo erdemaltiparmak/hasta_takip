@@ -39,7 +39,10 @@ dependencies:
   google_maps_flutter: 
   font_awesome_flutter: 
   url_launcher: 
-  
+  firebase_auth:
+  firebase_storage:
+  google_sign_in: 
+
 
 dev_dependencies:
   flutter_test:

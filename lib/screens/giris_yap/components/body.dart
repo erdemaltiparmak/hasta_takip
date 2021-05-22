@@ -1,11 +1,13 @@
 import 'dart:ui';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hasta_takip/screens/UI/main_page.dart';
+import 'package:hasta_takip/models/current_user.dart';
 import 'package:hasta_takip/screens/components/widgets.dart';
+import 'package:hasta_takip/screens/map_sample.dart';
+import 'package:hasta_takip/services/current_user_service.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
 import 'sifre_yenile.dart';
@@ -68,6 +70,8 @@ class GirisFormu extends StatefulWidget {
   _GirisFormuState createState() => _GirisFormuState();
 }
 
+CurrentUserService currentUserService = CurrentUserService();
+
 class _GirisFormuState extends State<GirisFormu> {
   bool isLogin;
   SharedPreferences sp;
@@ -78,6 +82,8 @@ class _GirisFormuState extends State<GirisFormu> {
     SharedPreferences.getInstance().then((value) => sp = value);
   }
 
+  bool isChecked = false;
+
   @override
   void dispose() {
     super.dispose();
@@ -86,11 +92,8 @@ class _GirisFormuState extends State<GirisFormu> {
   _GirisFormuState();
   @override
   Widget build(BuildContext context) {
-    bool remember = false;
-
     return Form(
       key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Expanded(
         child: Column(
           children: <Widget>[
@@ -104,21 +107,18 @@ class _GirisFormuState extends State<GirisFormu> {
                       keyboardType: TextInputType.emailAddress,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (value) {
-                        if (value.isNotEmpty) {
-                        } else if (emailValidatorRegExp.hasMatch(value)) {}
+                        if (value.isNotEmpty) {}
                         return null;
                       },
                       validator: (value) {
                         if (value.isEmpty) {
                           return kEmailNullError;
-                        } else if (!emailValidatorRegExp.hasMatch(value)) {
-                          return kInvalidEmailError;
                         }
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: "E-Mail",
-                        hintText: "E-mail adresiniz...",
+                        labelText: "Kullanıcı Adı",
+                        hintText: "Kullanıcı adınız...",
                         suffixIcon: Icon(Icons.mail_outline, color: kTextColor),
                         floatingLabelBehavior: FloatingLabelBehavior.always,
                         contentPadding: EdgeInsets.symmetric(
@@ -148,8 +148,6 @@ class _GirisFormuState extends State<GirisFormu> {
                       validator: (value) {
                         if (value.isEmpty) {
                           return kPassNullError;
-                        } else if (value.length < 7) {
-                          return kShortPassError;
                         }
                         return null;
                       },
@@ -181,11 +179,12 @@ class _GirisFormuState extends State<GirisFormu> {
                 Row(
                   children: [
                     Checkbox(
-                      value: remember,
+                      value: isChecked,
+                      checkColor: Colors.white,
                       activeColor: kPrimaryColor,
-                      onChanged: (value) {
+                      onChanged: (bool value) {
                         setState(() {
-                          remember = value;
+                          isChecked = value;
                         });
                       },
                     ),
@@ -215,19 +214,24 @@ class _GirisFormuState extends State<GirisFormu> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
-
                       if (await signIn(_eMail.text, _password.text, context)) {
-                        _saveSharedPreferences().then((value) {
+                        globalCurrentUser = currentUserService.getPersonel(
+                            FirebaseAuth.instance.currentUser.email);
+                        if (isChecked = isChecked) {
+                          _saveSharedPreferences().then((value) {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainScreen()));
+                          });
+                        } else {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MainPage()));
-                        });
+                                  builder: (context) => MainScreen()));
+                        }
                       } else {}
-                      setState(() {
-                        _eMail.clear();
-                        _password.clear();
-                      });
+                      setState(() {});
                     }
                   },
                   title: "Giriş Yap",
@@ -248,18 +252,19 @@ class _GirisFormuState extends State<GirisFormu> {
 }
 
 Future<bool> signIn(String email, String password, BuildContext context) async {
-  // try {
-  //   await FirebaseAuth.instance
-  //       .signInWithEmailAndPassword(email: email, password: password);
-  //   return true;
-  // } on FirebaseAuthException catch (e) {
-  //   if (e.code == 'user-not-found') {
-  //    //print('No user found for that email.');
-  //     _showMyDialog(context, "Bu maille bir kullanıcı kaydı bulunamadı.");
-  //   } else if (e.code == 'wrong-password') {
-  //     _showMyDialog(context, "Şifreniz yanlış");
-  //   }
-  return true;
+  try {
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      _showMyDialog(context, "Bu maille bir kullanıcı kaydı bulunamadı.");
+    } else if (e.code == 'wrong-password') {
+      _showMyDialog(context, "Şifreniz yanlış");
+    } else {
+      _showMyDialog(context, "Kayıt Bulunamadı");
+    }
+  }
 }
 
 Future<String> _saveSharedPreferences() async {

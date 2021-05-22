@@ -25,9 +25,9 @@ class CovidService {
 var url = "https://bitirmecalismasiapi.azurewebsites.net/api";
 
 class PersonelService {
-  Future<Personel> getPersonel() async {
+  Future<Personel> getPersonel(int id) async {
     Personel personel;
-    var data = await http.get(Uri.parse("$url/personel/1"));
+    var data = await http.get(Uri.parse("$url/personel/$id"));
     // ignore: deprecated_member_use
     if (data.statusCode == HttpStatus.BAD_REQUEST) {
       print(data.body);

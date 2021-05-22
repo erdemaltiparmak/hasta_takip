@@ -8,12 +8,14 @@ import 'package:hasta_takip/utils/shared_preferences.dart';
 import '../../../constants.dart';
 
 class Profil extends StatefulWidget {
+  final int personelId;
   Profil({
     Key key,
+    this.personelId,
   }) : super(key: key);
 
   @override
-  _ProfilState createState() => _ProfilState();
+  _ProfilState createState() => _ProfilState(personelId);
 }
 
 Future<Personel> personel;
@@ -24,11 +26,15 @@ var detailCache;
 var detailCacheId;
 
 class _ProfilState extends State<Profil> {
+  final int personelID;
+
+  _ProfilState(this.personelID);
+
   @override
   void initState() {
     super.initState();
 
-    personel = personelService.getPersonel();
+    personel = personelService.getPersonel(personelID);
   }
 
   @override
