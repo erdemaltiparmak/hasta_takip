@@ -35,6 +35,9 @@ class GirisWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
+        SizedBox(
+          height: yuksekligeGoreAyarla(context, 40),
+        ),
         Text(
           "Hasta Takip Sistemi",
           style: TextStyle(
@@ -121,6 +124,8 @@ class _GirisFormuState extends State<GirisFormu> {
                         hintText: "Kullanıcı adınız...",
                         suffixIcon: Icon(Icons.mail_outline, color: kTextColor),
                         floatingLabelBehavior: FloatingLabelBehavior.always,
+                        labelStyle: TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: yuksekligeGoreAyarla(context, 40),
                             vertical: genisligeGoreAyarla(context, 14)),
@@ -156,6 +161,8 @@ class _GirisFormuState extends State<GirisFormu> {
                         hintText: "Şifrenizi giriniz...",
                         suffixIcon: Icon(Icons.lock_outline, color: kTextColor),
                         floatingLabelBehavior: FloatingLabelBehavior.always,
+                        labelStyle: TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: yuksekligeGoreAyarla(context, 40),
                             vertical: genisligeGoreAyarla(context, 14)),
@@ -215,8 +222,6 @@ class _GirisFormuState extends State<GirisFormu> {
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
                       if (await signIn(_eMail.text, _password.text, context)) {
-                        globalCurrentUser = currentUserService.getPersonel(
-                            FirebaseAuth.instance.currentUser.email);
                         if (isChecked = isChecked) {
                           _saveSharedPreferences().then((value) {
                             Navigator.pushReplacement(
