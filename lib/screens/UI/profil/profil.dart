@@ -38,6 +38,8 @@ class _ProfilState extends State<Profil> {
     personel = personelService.getPersonel(personelID);
   }
 
+  bool isVisible = true;
+
   @override
   Widget build(BuildContext context) {
     List<PopUpMenuItems> menuItems = [
@@ -47,8 +49,9 @@ class _ProfilState extends State<Profil> {
         () {
           clearSharedPreferences();
           Future.delayed(Duration(seconds: 1), () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (c) => GirisEkrani()));
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => GirisEkrani()),
+                (Route<dynamic> route) => false);
           });
         },
       )
@@ -149,14 +152,23 @@ class _ProfilState extends State<Profil> {
                               fontSize: 20,
                               fontWeight: FontWeight.bold),
                         ),
-                        Icon(
-                          Icons.arrow_drop_down_circle_outlined,
-                          color: Colors.green,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isVisible = !isVisible;
+                            });
+                          },
+                          child: Icon(
+                            !isVisible
+                                ? Icons.arrow_drop_down_circle_outlined
+                                : Icons.arrow_drop_up_outlined,
+                            color: Colors.green,
+                          ),
                         )
                       ],
                     ),
                   ),
-                  HastaListesi(),
+                  Visibility(visible: isVisible, child: HastaListesi()),
                 ],
               ),
             ),
@@ -271,6 +283,6 @@ class _ProfilState extends State<Profil> {
 int karantinaHesapla(String takilmaTarihi) {
   var bitisTarihi = DateTime.parse(takilmaTarihi);
 
-  var fark = 10 - bitisTarihi.difference(DateTime.now()).inDays;
+  var fark = 0 - bitisTarihi.difference(DateTime.now()).inDays;
   return fark;
 }
