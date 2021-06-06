@@ -4,7 +4,7 @@ import 'package:hasta_takip/models/current_user.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-var url = "https://bitirmecalismasiapi.azurewebsites.net/api";
+var url = "https://bitirmecalismasiapi20210606183051.azurewebsites.net/api";
 
 class CurrentUserService {
   Future<CurrentUser> getPersonel(String who) async {

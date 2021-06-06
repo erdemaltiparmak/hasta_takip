@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hasta_takip/models/hasta.dart';
 import 'package:hasta_takip/utils/distance_calculate.dart';
+
+import 'hasata_detay.dart';
+
+move(LatLng konum) async {
+  CameraPosition cameraPosition = CameraPosition(target: konum, zoom: 18.4);
+  googleMapController
+      .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+}
 
 class UserBar extends StatelessWidget {
   const UserBar(
@@ -21,85 +30,92 @@ class UserBar extends StatelessWidget {
         hasta.hastaKonumX,
         hasta.hastaKonumY);
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          decoration: BoxDecoration(
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                blurRadius: 2,
-                color: Colors.green,
-              )
-            ],
-            borderRadius: BorderRadius.circular(50),
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.only(left: 10, right: 10, bottom: 0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                      width: 55,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        image: DecorationImage(image: defaultImage),
-                      )),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          hasta.hastaAd + " " + hasta.hastaSoyad,
-                          style: TextStyle(color: Colors.black, fontSize: 17),
-                        ),
-                        Text(
-                          hasta.hastaYas.toString(),
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                      ],
+    return GestureDetector(
+      onTap: () {
+        print("tık");
+        move(LatLng(snapshot.data.snapshot.value['konumX'],
+            snapshot.data.snapshot.value['konumY']));
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  blurRadius: 2,
+                  color: Colors.green,
+                )
+              ],
+              borderRadius: BorderRadius.circular(50),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                        width: 55,
+                        height: 55,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          image: DecorationImage(image: defaultImage),
+                        )),
+                    SizedBox(
+                      width: 10,
                     ),
-                  ),
-                  Icon(
-                    Icons.location_on,
-                    color: Colors.green,
-                    size: 36,
-                  ),
-                ],
-              ),
-              distance < 50
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Hasta Evinde :",
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16.5,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          distance.toStringAsFixed(2) + " m",
-                          style: TextStyle(color: Colors.black, fontSize: 15),
-                        )
-                      ],
-                    )
-                  : Text(
-                      "Hasta evinde değil!",
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 21),
-                    )
-            ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            hasta.hastaAd + " " + hasta.hastaSoyad,
+                            style: TextStyle(color: Colors.black, fontSize: 17),
+                          ),
+                          Text(
+                            hasta.hastaYas.toString(),
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.location_on,
+                      color: Colors.green,
+                      size: 36,
+                    ),
+                  ],
+                ),
+                distance < 50
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Hasta Evinde :",
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            distance.toStringAsFixed(2) + " m",
+                            style: TextStyle(color: Colors.black, fontSize: 15),
+                          )
+                        ],
+                      )
+                    : Text(
+                        "Hasta evinde değil!",
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 21),
+                      )
+              ],
+            ),
           ),
         ),
       ),

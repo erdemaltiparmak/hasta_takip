@@ -3,6 +3,7 @@ import 'package:hasta_takip/models/hasta.dart';
 import 'package:hasta_takip/models/personel.dart';
 import 'package:hasta_takip/screens/UI/hasta/hasata_detay.dart';
 import 'package:hasta_takip/screens/giris_yap/giris_ekrani.dart';
+import 'package:hasta_takip/screens/map_sample.dart';
 import 'package:hasta_takip/services/covid_service.dart';
 import 'package:hasta_takip/utils/shared_preferences.dart';
 import '../../../constants.dart';
@@ -129,7 +130,7 @@ class _ProfilState extends State<Profil> {
                         padding: EdgeInsets.only(top: 115),
                         alignment: Alignment.center,
                         child: Text(
-                          "Doç. Dr. Cüneyt Bayılmış",
+                          user.personelAd + " " + user.personelSoyad,
                           style: TextStyle(color: Colors.black, fontSize: 17),
                         ),
                       )

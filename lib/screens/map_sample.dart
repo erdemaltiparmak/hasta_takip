@@ -15,6 +15,7 @@ class MainScreen extends StatefulWidget {
 }
 
 CurrentUserService currentUserService = CurrentUserService();
+CurrentUser user;
 
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
@@ -42,7 +43,6 @@ class _MainScreenState extends State<MainScreen>
         },
       )
     ];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
@@ -63,7 +63,7 @@ class _MainScreenState extends State<MainScreen>
                     ),
                   );
                 }
-                CurrentUser user = snapshot.data;
+                user = snapshot.data;
 
                 return Column(
                   children: [

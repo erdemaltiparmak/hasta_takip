@@ -22,7 +22,7 @@ class CovidService {
   }
 }
 
-var url = "https://bitirmecalismasiapi.azurewebsites.net/api";
+var url = "https://bitirmecalismasiapi20210606183051.azurewebsites.net/api";
 
 class PersonelService {
   Future<Personel> getPersonel(int id) async {

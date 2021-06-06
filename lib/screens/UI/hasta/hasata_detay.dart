@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hasta_takip/models/hasta.dart';
@@ -13,6 +14,8 @@ class HastaDetay extends StatefulWidget {
   _HastaDetayState createState() => _HastaDetayState(hasta);
 }
 
+GoogleMapController googleMapController;
+
 class _HastaDetayState extends State<HastaDetay> {
   final Hasta hasta;
   final referenceDatabase = FirebaseDatabase.instance;
@@ -24,7 +27,10 @@ class _HastaDetayState extends State<HastaDetay> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController.complete(controller);
+    googleMapController = controller;
   }
+
+  LatLng hastaKonum;
 
   void _onCameraMoveStarted() {}
 
@@ -64,6 +70,8 @@ class _HastaDetayState extends State<HastaDetay> {
               ),
             );
           }
+          hastaKonum = LatLng(snapshot.data.snapshot.value['konumX'],
+              snapshot.data.snapshot.value['konumY']);
           return Stack(
             children: [
               Positioned.fill(
@@ -75,15 +83,13 @@ class _HastaDetayState extends State<HastaDetay> {
                         circleId: CircleId("evCircle"),
                         strokeWidth: 1,
                         radius: 20,
-                        center: LatLng(snapshot.data.snapshot.value['konumX'],
-                            snapshot.data.snapshot.value['konumY']),
+                        center: hastaKonum,
                         fillColor: Colors.greenAccent.withOpacity(.4))
                   },
                   markers: {
                     Marker(
                         markerId: MarkerId("hasta"),
-                        position: LatLng(snapshot.data.snapshot.value['konumX'],
-                            snapshot.data.snapshot.value['konumY']),
+                        position: hastaKonum,
                         icon: personLocationIcon),
                     Marker(
                       markerId: MarkerId("ev"),
@@ -278,6 +284,7 @@ class HastaAyrinti extends StatelessWidget {
                                         "sms:${hasta.hastaIletisimNo}");
                                   }),
                               hastaBilgileriButton(
+                                  color: Colors.red,
                                   icon: Icons.ac_unit,
                                   onPressed: () {
                                     _launchCaller("tel:112");
@@ -299,7 +306,8 @@ class HastaAyrinti extends StatelessWidget {
       {@required Object icon,
       @required Function onPressed,
       String text = "",
-      String toolTip = ""}) {
+      String toolTip = "",
+      Color color = Colors.green}) {
     return MouseRegion(
       onHover: (v) {
         print(v.toString());
@@ -308,8 +316,8 @@ class HastaAyrinti extends StatelessWidget {
         width: 70,
         height: 70,
         margin: EdgeInsets.only(left: 10),
-        decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(5)),
+        decoration:
+            BoxDecoration(color: color, borderRadius: BorderRadius.circular(5)),
         child: Tooltip(
           message: toolTip,
           child: MaterialButton(
